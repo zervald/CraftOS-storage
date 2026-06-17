@@ -9,22 +9,24 @@
   # https://devenv.sh/basics/
   # env.GREET = "devenv";
 
-  # https://devenv.sh/packages/
-  packages = [ pkgs.craftos-pc ];
-
   # https://devenv.sh/languages/
   # languages.rust.enable = true;
 
+  # https://devenv.sh/packages/
+  packages = with pkgs; [ craftos-pc ];
+
   # https://devenv.sh/processes/
-  # processes.dev.exec = "${lib.getExe pkgs.watchexec} -n -- ls -la";
+  # processes.cc0 = {
+  #   exec = "craftos --mount-ro repo=./";
+  # };
 
   # https://devenv.sh/services/
   # services.postgres.enable = true;
 
   # https://devenv.sh/scripts/
-  # scripts.hello.exec = ''
-  #   echo hello from $GREET
-  # '';
+  scripts.cc0 = {
+    exec = "craftos --mount-ro repo=./ &";
+  };
 
   # https://devenv.sh/basics/
   # enterShell = ''
