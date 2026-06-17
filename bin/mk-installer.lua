@@ -1,4 +1,5 @@
 #!/usr/bin/env lua
+
 local function with_command(command, fn)
   local handle, err = io.popen(command)
   if not handle then
@@ -12,8 +13,10 @@ local function with_command(command, fn)
   return result
 end
 
-local output = {"local files = {\n"}
-local function append(x) output[#output + 1] = x end
+local output = { "local files = {\n" }
+local function append(x)
+  output[#output + 1] = x
+end
 
 with_command("git ls-files", function(handle)
   for file in handle:lines() do
@@ -25,10 +28,11 @@ end)
 append("}\n")
 
 append([[
+local repo = "https://raw.githubusercontent.com/zervald/CraftOS-storage/HEAD/src/"
 local tasks = {}
 for i, path in ipairs(files) do
   tasks[i] = function()
-    local req, err = http.get("https://raw.githubusercontent.com/SquidDev-CC/artist/HEAD/src/" .. path)
+    local req, err = http.get(repo .. path)
     if not req then error("Failed to download " .. path .. ": " .. err, 0) end
 
     local file = fs.open(".artist.d/src/" .. path, "w")
@@ -50,7 +54,9 @@ local result = table.concat(output)
 
 local h = io.open("installer.lua")
 local existing = h and h:read("*a") or ""
-if h then h:close() end
+if h then
+  h:close()
+end
 
 if existing == result then
   os.exit(0)
