@@ -24,8 +24,11 @@
   # services.postgres.enable = true;
 
   # https://devenv.sh/scripts/
-  scripts.cc0 = {
-    exec = "craftos --mount-ro repo=./ &";
+
+  scripts = {
+
+    cc0.exec = "craftos --mount-ro repo=./ &";
+    cc-test.exec = "craftos --mount-ro /=./ --exec \"shell.run('bin/mcfly.lua')\"  &";
   };
 
   # https://devenv.sh/basics/
@@ -43,7 +46,6 @@
   # https://devenv.sh/tests/
   # enterTest = ''
   #   echo "Running tests"
-  #   git --version | grep --color=auto "${pkgs.git.version}"
   # '';
 
   # https://devenv.sh/git-hooks/
