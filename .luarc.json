@@ -1,0 +1,7 @@
+{
+  "workspace.library": [
+    "./craftos2-rom/rom/modules/main/",
+    "./craftos2-rom/rom/apis/"
+  ],
+  "workspace.ignoreSubmodules": false
+}

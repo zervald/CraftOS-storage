@@ -10,7 +10,10 @@
   # env.GREET = "devenv";
 
   # https://devenv.sh/languages/
-  # languages.rust.enable = true;
+  languages.lua = {
+    enable = true;
+    lsp.enable = true;
+  };
 
   # https://devenv.sh/packages/
   packages = with pkgs; [ craftos-pc ];
@@ -26,7 +29,6 @@
   # https://devenv.sh/scripts/
 
   scripts = {
-
     cc0.exec = "craftos --mount-ro repo=./ &";
     cc-test.exec = "craftos --mount-ro /=./ --exec \"shell.run('bin/mcfly.lua')\"  &";
   };
