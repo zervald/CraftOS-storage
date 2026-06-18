@@ -1,7 +1,8 @@
 {
   "workspace.library": [
-    "./craftos2-rom/rom/modules/main/",
-    "./craftos2-rom/rom/apis/"
+    "${workspaceFolder}/craftos2-rom/rom/modules/main/",
+    "${workspaceFolder}/craftos2-rom/rom/apis/",
+    "${workspaceFolder}/src/**/"
   ],
   "workspace.ignoreSubmodules": false
 }

@@ -29,15 +29,15 @@
   # https://devenv.sh/scripts/
 
   scripts = {
-    cc0.exec = "craftos --mount-ro repo=./ &";
-    cc-test.exec = "craftos --mount-ro /=./ --exec \"shell.run('bin/mcfly.lua')\"  &";
+    dev-cc0.exec = "craftos --mount-ro repo=./ &";
+    dev-test.exec = "craftos --mount-ro /=./ --exec \"shell.run('bin/mcfly.lua')\"  &";
   };
 
   # https://devenv.sh/basics/
-  # enterShell = ''
-  #   hello         # Run scripts directly
-  #   git --version # Use packages
-  # '';
+  enterShell = ''
+    export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/modules/main/?.lua";
+    export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/apis/?.lua"
+  '';
 
   # https://devenv.sh/tasks/
   # tasks = {
