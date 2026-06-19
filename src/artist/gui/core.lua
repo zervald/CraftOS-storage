@@ -453,7 +453,7 @@ function Input:blur(term)
   term.setCursorBlink(false)
 end
 
-local Frame = class("artist.gui.core.Frame") --- @type Frame
+local Frame = class("artist.gui.core.Frame") ---@class Frame
 
 function Frame:initialise(options)
   expect(1, options, "table")
@@ -477,7 +477,7 @@ function Frame:draw(term, palette)
   end
 end
 
-local Text = class("artist.gui.core.Text") --- @type Text
+local Text = class("artist.gui.core.Text") ---@class Text
 
 function Text:initialise(options)
   expect(1, options, "table")
@@ -499,7 +499,7 @@ function Text:set_text(text)
     text = text .. (" "):rep(self._width - #text)
   end
 
-  if text == self.text then
+  if text == self._text then
     return
   end
 
