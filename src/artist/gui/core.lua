@@ -10,7 +10,7 @@ We define our "core" datatype as an object with any of these properties:
   be used to set up any additional behaviour needed (such as subscribing to
   mediator channels).
 - `T:detach()`: Detach this component, cleaning up any leftover behaviour.
-- `T:draw(palette: table)`: Draw this component. Accepts a palette of 6 colours:
+- `T:draw(palette: table)`: Draw this component. Accepts a palette of 6 colors:
    `cyan`, `green`, `grey`, `lightGrey`, `red`, `white`.
 - `T:handle_event(event)`: Handle an event. Note, keyboard-related events should
    be handled with `keymap` in most cases rather than here.
@@ -23,26 +23,30 @@ the tab key is pressed. They have the following properties:
 - `T:blur(term: table)` - Mark this object as no longer focused.
 ]]
 
-local expect = require "cc.expect"
+local expect = require("cc.expect")
 local expect, field = expect.expect, expect.field
-local class = require "artist.lib.class"
-local keybinding = require "metis.input.keybinding"
+local class = require("artist.lib.class")
+local keybinding = require("metis.input.keybinding")
 
 --------------------------------------------------------------------------------
 -- Various helper functions
 --------------------------------------------------------------------------------
 
 local function clamp(value, min, max)
-  if value < min then return min end
-  if value > max then return max end
+  if value < min then
+    return min
+  end
+  if value > max then
+    return max
+  end
   return value
 end
 
 local function void() end
 
 local function write_with(term, text, fg, bg)
-  term.setBackgroundColour(bg)
-  term.setTextColour(fg)
+  term.setBackgroundcolor(bg)
+  term.setTextcolor(fg)
   term.write(text)
 end
 
@@ -65,7 +69,7 @@ local function draw_border(term, back, border, x, y, width, height)
     term.setCursorPos(x, dy + y)
     draw_border_cell(term, back, border, "\149", true)
 
-    term.setBackgroundColour(back)
+    term.setBackgroundcolor(back)
     term.write((" "):rep(width - 2))
 
     draw_border_cell(term, back, border, "\149", false)
@@ -78,40 +82,42 @@ local function draw_border(term, back, border, x, y, width, height)
 end
 
 --------------------------------------------------------------------------------
--- Palette support. We offer 2 palettes of 6 colours (could be more, these are
+-- Palette support. We offer 2 palettes of 6 colors (could be more, these are
 -- just the ones we use), in a bright (normal) and dimmed (when masked by a
 -- dialog) variety.
 --------------------------------------------------------------------------------
 
-local bright_colours = {
-  cyan      = colours.cyan,
-  green     = colours.green,
-  grey      = colours.grey,
-  lightGrey = colours.lightGrey,
-  red       = colours.red,
-  white     = colours.white,
-  black     = colours.black,
+local bright_colors = {
+  cyan = colors.cyan,
+  green = colors.green,
+  grey = colors.grey,
+  lightGrey = colors.lightGrey,
+  red = colors.red,
+  white = colors.white,
+  black = colors.black,
 }
 
-local dimmed_colours = {
-  cyan      = colours.blue,
-  green     = colours.brown,
-  grey      = colours.lightBlue,
-  lightGrey = colours.lime,
-  red       = colours.magenta,
-  white     = colours.orange,
-  black     = colours.black,
+local dimmed_colors = {
+  cyan = colors.blue,
+  green = colors.brown,
+  grey = colors.lightBlue,
+  lightGrey = colors.lime,
+  red = colors.magenta,
+  white = colors.orange,
+  black = colors.black,
 }
 
---- Set up the palette, defining normal and dimmed colours.
+--- Set up the palette, defining normal and dimmed colors.
 local function setup_palette(term)
   local palette = {}
-  for i = 0, 15 do palette[i] = { term.getPaletteColour(2 ^ i) } end
+  for i = 0, 15 do
+    palette[i] = { term.getPalettecolor(2 ^ i) }
+  end
 
-  for k, v in pairs(dimmed_colours) do
-    if bright_colours[k] ~= v then
-      local original = palette[math.floor(math.log(colours[k]) / math.log(2))]
-      term.setPaletteColour(v, original[1] * 0.35, original[2] * 0.35, original[3] * 0.35)
+  for k, v in pairs(dimmed_colors) do
+    if bright_colors[k] ~= v then
+      local original = palette[math.floor(math.log(colors[k]) / math.log(2))]
+      term.setPalettecolor(v, original[1] * 0.35, original[2] * 0.35, original[3] * 0.35)
     end
   end
 
@@ -122,7 +128,7 @@ end
 local function restore_palette(term, palette)
   for i = 0, 15 do
     local c = palette[i]
-    term.setPaletteColour(2 ^ i, c[1], c[2], c[3])
+    term.setPalettecolor(2 ^ i, c[1], c[2], c[3])
   end
 end
 
@@ -130,15 +136,25 @@ end
 -- Our actual controls!
 --------------------------------------------------------------------------------
 
-local function basic_attach(self, f) self.mark_dirty = f end
-local function basic_detach(self) self.mark_dirty = nil end
-local function basic_focus(self) self._focused = true self:mark_dirty() end
-local function basic_blur(self) self._focused = false self:mark_dirty() end
+local function basic_attach(self, f)
+  self.mark_dirty = f
+end
+local function basic_detach(self)
+  self.mark_dirty = nil
+end
+local function basic_focus(self)
+  self._focused = true
+  self:mark_dirty()
+end
+local function basic_blur(self)
+  self._focused = false
+  self:mark_dirty()
+end
 
 --- A basic button, which can be clicked.
 --
 -- @type Button
-local Button = class "artist.gui.core.Button"
+local Button = class("artist.gui.core.Button")
 function Button:initialise(options)
   expect(1, options, "table")
 
@@ -148,7 +164,7 @@ function Button:initialise(options)
   self.run = field(options, "run", "function")
   self.fg = field(options, "fg", "string", "nil") or "white"
   self.bg = field(options, "bg", "string", "nil") or "cyan"
-  self.keymap = keybinding.create_keymap { ["enter"] = self.run }
+  self.keymap = keybinding.create_keymap({ ["enter"] = self.run })
   self._focused = false
 end
 
@@ -175,7 +191,7 @@ end
 -- Should this be in a separate file? Probably!
 --
 -- @type Input
-local Input = class "artist.gui.core.Input"
+local Input = class("artist.gui.core.Input")
 
 local function set_line(self, line)
   self.line = line
@@ -199,7 +215,9 @@ local function set_pos(self, pos)
 end
 
 local function insert_line(self, txt)
-  if txt == "" then return end
+  if txt == "" then
+    return
+  end
   local line, pos = self.line, self.pos
   set_line(self, line:sub(1, pos) .. txt .. line:sub(pos + 1))
   set_pos(self, pos + #txt)
@@ -208,7 +226,11 @@ end
 --- Attempt to find the position of the next word
 local function next_word(self)
   local offset = self.line:find("%w%W", self.pos + 1)
-  if offset then return offset else return #self.line end
+  if offset then
+    return offset
+  else
+    return #self.line
+  end
 end
 
 --- Attempt to find the position of the previous word
@@ -229,20 +251,32 @@ end
 local function move_to(self, fn)
   return function()
     local pos = fn(self)
-    if pos == self.pos then return end
+    if pos == self.pos then
+      return
+    end
     set_pos(self, pos)
   end
 end
 
-local function left(self) return math.max(0, self.pos - 1) end
-local function right(self) return math.min(#self.line, self.pos + 1) end
-local function start() return 0 end
-local function finish(self) return #self.line end
+local function left(self)
+  return math.max(0, self.pos - 1)
+end
+local function right(self)
+  return math.min(#self.line, self.pos + 1)
+end
+local function start()
+  return 0
+end
+local function finish(self)
+  return #self.line
+end
 
 local function on_word(self, fn)
   return function()
     local line, pos = self.line, self.pos
-    if pos >= #line then return end
+    if pos >= #line then
+      return
+    end
 
     local next = next_word(self)
     set_line(self, line:sub(1, pos) .. fn(line:sub(pos + 1, next)) .. line:sub(next + 1))
@@ -251,8 +285,12 @@ local function on_word(self, fn)
 end
 
 local function kill_region(self, from, to)
-  if self.pos <= 0 then return end
-  if from >= to then return end
+  if self.pos <= 0 then
+    return
+  end
+  if from >= to then
+    return
+  end
 
   self._last_killed = self.line:sub(from + 1, to)
   set_line(self, self.line:sub(1, from) .. self.line:sub(to + 1))
@@ -261,14 +299,18 @@ end
 
 local function kill_before(self, fn)
   return function()
-    if self.pos <= 0 then return end
+    if self.pos <= 0 then
+      return
+    end
     return kill_region(self, fn(self), self.pos)
   end
 end
 
 local function kill_after(self, fn)
   return function()
-    if self.pos >= #self.line then return end
+    if self.pos >= #self.line then
+      return
+    end
     return kill_region(self, self.pos, fn(self))
   end
 end
@@ -292,23 +334,34 @@ function Input:initialise(options)
 
   self._last_killed = nil
 
-  self.keymap = keybinding.create_keymap {
-    ["char"] = function(char) insert_line(self, char) end,
+  self.keymap = keybinding.create_keymap({
+    ["char"] = function(char)
+      insert_line(self, char)
+    end,
 
     -- Text movement.
-    ["right"] = move_to(self, right), ["C-f"] = move_to(self, right),
-    ["left"] = move_to(self, left), ["C-b"] = move_to(self, left),
-    ["C-right"] = move_to(self, next_word), ["M-f"] = move_to(self, next_word),
-    ["C-left"] = move_to(self, prev_word), ["M-b"] = move_to(self, prev_word),
-    ["home"] = move_to(self, start), ["C-a"] = move_to(self, start),
-    ["end"] = move_to(self, finish), ["C-e"] = move_to(self, finish),
+    ["right"] = move_to(self, right),
+    ["C-f"] = move_to(self, right),
+    ["left"] = move_to(self, left),
+    ["C-b"] = move_to(self, left),
+    ["C-right"] = move_to(self, next_word),
+    ["M-f"] = move_to(self, next_word),
+    ["C-left"] = move_to(self, prev_word),
+    ["M-b"] = move_to(self, prev_word),
+    ["home"] = move_to(self, start),
+    ["C-a"] = move_to(self, start),
+    ["end"] = move_to(self, finish),
+    ["C-e"] = move_to(self, finish),
 
     -- Transpose a character
     ["C-t"] = function()
       local line, prev, cur = self.line
-      if self.pos == #line then prev, cur = self.pos - 1, self.pos
-      elseif self.pos == 0 then prev, cur = 1, 2
-      else prev, cur = self.pos, self.pos + 1
+      if self.pos == #line then
+        prev, cur = self.pos - 1, self.pos
+      elseif self.pos == 0 then
+        prev, cur = 1, 2
+      else
+        prev, cur = self.pos, self.pos + 1
       end
 
       set_line(self, line:sub(1, prev - 1) .. line:sub(cur, cur) .. line:sub(prev, prev) .. line:sub(cur + 1))
@@ -316,17 +369,25 @@ function Input:initialise(options)
     end,
     ["M-u"] = on_word(self, string.upper),
     ["M-l"] = on_word(self, string.lower),
-    ["M-c"] = on_word(self, function(s) return s:sub(1, 1):upper() .. s:sub(2):lower() end),
+    ["M-c"] = on_word(self, function(s)
+      return s:sub(1, 1):upper() .. s:sub(2):lower()
+    end),
 
     ["backspace"] = function()
-      if self.pos <= 0 then return end
+      if self.pos <= 0 then
+        return
+      end
 
       set_line(self, self.line:sub(1, self.pos - 1) .. self.line:sub(self.pos + 1))
-      if self.scroll > 0 then self.scroll = self.scroll - 1 end
+      if self.scroll > 0 then
+        self.scroll = self.scroll - 1
+      end
       set_pos(self, self.pos - 1)
     end,
     ["delete"] = function()
-      if self.pos >= #self.line then return end
+      if self.pos >= #self.line then
+        return
+      end
       set_line(self, self.line:sub(1, self.pos) .. self.line:sub(self.pos + 2))
     end,
 
@@ -335,10 +396,12 @@ function Input:initialise(options)
     ["C-k"] = kill_after(self, finish),
     ["M-d"] = kill_after(self, next_word),
     ["C-y"] = function()
-      if not self._last_killed then return end
+      if not self._last_killed then
+        return
+      end
       insert_line(self, self._last_killed)
     end,
-  }
+  })
 end
 
 function Input:handle_event(args)
@@ -361,11 +424,11 @@ function Input:draw(term, palette, always)
   end
 
   local line = self.line
-  term.setBackgroundColour(palette[self.bg])
+  term.setBackgroundcolor(palette[self.bg])
   if self.line ~= "" then
-    term.setTextColour(palette[self.fg])
+    term.setTextcolor(palette[self.fg])
   else
-    term.setTextColour(palette.lightGrey)
+    term.setTextcolor(palette.lightGrey)
     line = self.placeholder
   end
 
@@ -376,10 +439,12 @@ function Input:draw(term, palette, always)
   term.write(string.sub(line, self.scroll + 1, self.scroll + self.width))
 end
 
-function Input:attach(f) self.mark_dirty = f end
+function Input:attach(f)
+  self.mark_dirty = f
+end
 
 function Input:focus(term)
-  term.setTextColour(colours[self.fg])
+  term.setTextcolor(colors[self.fg])
   term.setCursorPos(self.x + self.pos - self.scroll, self.y)
   term.setCursorBlink(true)
 end
@@ -388,7 +453,7 @@ function Input:blur(term)
   term.setCursorBlink(false)
 end
 
-local Frame = class "artist.gui.core.Frame" --- @type Frame
+local Frame = class("artist.gui.core.Frame") --- @type Frame
 
 function Frame:initialise(options)
   expect(1, options, "table")
@@ -403,7 +468,7 @@ function Frame:initialise(options)
 end
 
 function Frame:draw(term, palette)
-  term.setBackgroundColour(palette.white)
+  term.setBackgroundcolor(palette.white)
 
   local line = (" "):rep(self._width)
   for i = 1, self._height do
@@ -412,7 +477,7 @@ function Frame:draw(term, palette)
   end
 end
 
-local Text = class "artist.gui.core.Text" --- @type Text
+local Text = class("artist.gui.core.Text") --- @type Text
 
 function Text:initialise(options)
   expect(1, options, "table")
@@ -434,17 +499,21 @@ function Text:set_text(text)
     text = text .. (" "):rep(self._width - #text)
   end
 
-  if text == self.text then return end
+  if text == self.text then
+    return
+  end
 
   self._text = text
-  if self.mark_dirty then self:mark_dirty() end
+  if self.mark_dirty then
+    self:mark_dirty()
+  end
 end
 
 Text.attach, Text.detach = basic_attach, basic_detach
 
 function Text:draw(term, palette)
-  term.setTextColour(palette[self.fg])
-  term.setBackgroundColour(palette.white)
+  term.setTextcolor(palette[self.fg])
+  term.setBackgroundcolor(palette.white)
   term.setCursorPos(self._x, self._y)
   term.write(self._text)
 end
@@ -455,26 +524,36 @@ end
 
 local function call_recursive(obj, method, ...)
   local fn, children = obj[method], obj.children
-  if fn then fn(obj, ...) end
+  if fn then
+    fn(obj, ...)
+  end
   if children then
-    for i = 1, #children do call_recursive(children[i], method, ...) end
+    for i = 1, #children do
+      call_recursive(children[i], method, ...)
+    end
   end
 end
 
 local function draw(obj, always, term, palette)
   if always or obj.__dirty then
     obj.__dirty = false
-    if obj.draw then obj:draw(term, palette, always) end
+    if obj.draw then
+      obj:draw(term, palette, always)
+    end
   end
 
   local children = obj.children
   if children then
-    for i = 1, #children do draw(children[i], always, term, palette) end
+    for i = 1, #children do
+      draw(children[i], always, term, palette)
+    end
   end
 end
 
 local function list_focused(obj, keymap, out)
-  if obj.keymap then keymap = keybinding.create_keymap(keymap, obj.keymap) end
+  if obj.keymap then
+    keymap = keybinding.create_keymap(keymap, obj.keymap)
+  end
 
   if obj.focus then
     local idx = #out + 1
@@ -483,7 +562,9 @@ local function list_focused(obj, keymap, out)
 
   local children = obj.children
   if children then
-    for i = 1, #children do list_focused(children[i], keymap, out) end
+    for i = 1, #children do
+      list_focused(children[i], keymap, out)
+    end
   end
 
   return out
@@ -493,20 +574,26 @@ local function move_focus(self, direction)
   local layer = self._layers[#self._layers]
   local focusable = layer.__focusable
   local focusable_n = #focusable
-  if focusable_n == 0 then return end
+  if focusable_n == 0 then
+    return
+  end
 
   local old_focused = layer.__focused
   local new_focused = focusable[((old_focused and old_focused.idx or 1) + direction - 1) % focusable_n + 1]
   layer.__focused = new_focused
 
-  if old_focused == new_focused then return end
+  if old_focused == new_focused then
+    return
+  end
 
-  if old_focused then old_focused.element:blur(self._term) end
+  if old_focused then
+    old_focused.element:blur(self._term)
+  end
   new_focused.element:focus(self._term)
   self._keybindings:set_keymap(new_focused.keymap)
 end
 
-local UI = class "artist.gui.core.UI"
+local UI = class("artist.gui.core.UI")
 
 function UI:initialise(term)
   expect(1, term, "table")
@@ -514,10 +601,14 @@ function UI:initialise(term)
   self._layers = {}
   self._term = term
 
-  self._keymap = keybinding.create_keymap {
-    ["tab"] = function() move_focus(self, 1) end,
-    ["S-tab"] = function() move_focus(self, -1) end,
-  }
+  self._keymap = keybinding.create_keymap({
+    ["tab"] = function()
+      move_focus(self, 1)
+    end,
+    ["S-tab"] = function()
+      move_focus(self, -1)
+    end,
+  })
   self._keybindings = keybinding.create()
 
   self._redraw_layer = false --- The lowest layer which needs redrawing.
@@ -553,7 +644,9 @@ function UI:push(layer)
   end)
 
   -- Blur the current layer.
-  if old_layer and old_layer.__focused then old_layer.__focused.element:blur(self._term) end
+  if old_layer and old_layer.__focused then
+    old_layer.__focused.element:blur(self._term)
+  end
 
   -- Then compute all focusable elements in the new one and focus the first one.
   local focusable = list_focused(layer, self._keymap, {})
@@ -561,7 +654,9 @@ function UI:push(layer)
 
   if layer.auto_focus ~= false then
     layer.__focused = focusable[1]
-    if layer.__focused then layer.__focused.element:focus(self._term) end
+    if layer.__focused then
+      layer.__focused.element:focus(self._term)
+    end
   end
   self._keybindings:set_keymap(layer.__focused and layer.__focused.keymap or layer.keymap or self._keymap)
 
@@ -573,8 +668,12 @@ function UI:pop()
   local layer = self._layers[#self._layers]
 
   -- Blur the removed layer and focus the current one on top.
-  if old_layer.__focused then old_layer.__focused.element:blur(self._term) end
-  if layer and layer.__focused then layer.__focused.element:focus(self._term) end
+  if old_layer.__focused then
+    old_layer.__focused.element:blur(self._term)
+  end
+  if layer and layer.__focused then
+    layer.__focused.element:focus(self._term)
+  end
   self._keybindings:set_keymap(layer and (layer.__focused and layer.__focused.keymap or layer.keymap) or self._keymap)
 
   call_recursive(old_layer, "detach")
@@ -587,8 +686,8 @@ function UI:run()
 
   local palette = setup_palette(term)
 
-  term.setBackgroundColour(colours.white)
-  term.setTextColour(colours.black)
+  term.setBackgroundcolor(colors.white)
+  term.setTextcolor(colors.black)
   term.clear()
 
   while #self._layers > 0 do
@@ -601,37 +700,39 @@ function UI:run()
       call_recursive(top_layer, "handle_event", event)
     end
     self._in_event = false
-    if #self._layers <= 0 then break end
+    if #self._layers <= 0 then
+      break
+    end
 
     if self._redraw_layer then
       -- Capture cursor info and hide the cursor. If we're blinking, restore the
       -- cursor once drawing is done.
-      local blink, fg, x, y = term.getCursorBlink(), term.getTextColour(), term.getCursorPos()
+      local blink, fg, x, y = term.getCursorBlink(), term.getTextcolor(), term.getCursorPos()
       if blink then
         term.setCursorBlink(false)
       end
 
       local redraw_layer, n_layers = self._redraw_layer, #self._layers
       for i = math.max(1, redraw_layer), n_layers - 1 do
-        draw(self._layers[i], redraw_layer < i, term, dimmed_colours)
+        draw(self._layers[i], redraw_layer < i, term, dimmed_colors)
       end
-      draw(self._layers[n_layers], redraw_layer < n_layers, term, bright_colours)
+      draw(self._layers[n_layers], redraw_layer < n_layers, term, bright_colors)
 
       self._redraw_layer = false
 
       if blink then
-        term.setTextColour(fg)
+        term.setTextcolor(fg)
         term.setCursorPos(x, y)
         term.setCursorBlink(true)
       end
 
-      term.setBackgroundColour(colours.magenta)
+      term.setBackgroundcolor(colors.magenta)
     end
   end
 
   term.setCursorPos(1, 1)
-  term.setBackgroundColour(colours.black)
-  term.setTextColour(colours.white)
+  term.setBackgroundcolor(colors.black)
+  term.setTextcolor(colors.white)
   term.clear()
 
   restore_palette(term, palette)
@@ -640,7 +741,8 @@ end
 return {
   draw_border = draw_border,
 
-  basic_attach = basic_attach, basic_detach = basic_detach,
+  basic_attach = basic_attach,
+  basic_detach = basic_detach,
 
   Button = Button,
   Input = Input,
