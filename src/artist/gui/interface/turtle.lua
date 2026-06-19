@@ -81,7 +81,7 @@ return function(context)
   end
 
   context:spawn(function()
-    sleep(0.5) -- Let the system reach some steady state.
+    sleep(0.2) -- Let the system reach some steady state.
 
     scheduled_dropoff = true
     turtle_tasks.spawn(turtle_dropoff)
