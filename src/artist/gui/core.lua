@@ -713,7 +713,7 @@ function UI:run()
       end
 
       local redraw_layer, n_layers = self._redraw_layer, #self._layers
-      for i = math.max(1, redraw_layer), n_layers - 1 do
+      for i = math.max(1, (redraw_layer and 1 or 0)), n_layers - 1 do
         draw(self._layers[i], redraw_layer < i, term, dimmed_colors)
       end
       draw(self._layers[n_layers], redraw_layer < n_layers, term, bright_colors)
