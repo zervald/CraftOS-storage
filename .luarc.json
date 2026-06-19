@@ -1,8 +1,10 @@
 {
-  "workspace.library": [
-    "${workspaceFolder}/craftos2-rom/rom/modules/main/",
-    "${workspaceFolder}/craftos2-rom/rom/apis/",
-    "${workspaceFolder}/src/**/"
+  "workspace.userThirdParty": [
+    "${workspaceFolder}/lls-addons/"
   ],
-  "workspace.ignoreSubmodules": false
+  "workspace.ignoreSubmodules": false,
+  "workspace.checkThirdParty": "ApplyInMemory",
+  "workspace.library": [
+    "./lls-addons/CC-tweaked/"
+  ]
 }

@@ -5,6 +5,9 @@
   inputs,
   ...
 }:
+let
+  luaPackages = pkgs.lua52Packages;
+in
 {
   # https://devenv.sh/basics/
   # env.GREET = "devenv";
@@ -16,7 +19,9 @@
   };
 
   # https://devenv.sh/packages/
-  packages = with pkgs; [ craftos-pc ];
+  packages = with pkgs; [
+    craftos-pc
+  ];
 
   # https://devenv.sh/processes/
   # processes.cc0 = {
@@ -34,10 +39,10 @@
   };
 
   # https://devenv.sh/basics/
-  enterShell = ''
-    export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/modules/main/?.lua";
-    export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/apis/?.lua"
-  '';
+  # enterShell = ''
+  #   export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/modules/main/?.lua";
+  #   export LUA_PATH="$LUA_PATH;${config.git.root}/craftos2-rom/rom/apis/?.lua"
+  # '';
 
   # https://devenv.sh/tasks/
   # tasks = {

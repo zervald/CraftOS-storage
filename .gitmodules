@@ -1,3 +1,3 @@
-[submodule "craftos2-rom"]
-	path = craftos2-rom
-	url = https://github.com/MCJack123/craftos2-rom.git
+[submodule "lls-addons/CC-tweaked"]
+	path = lls-addons/CC-tweaked
+	url = https://gitlab.com/carsakiller/cc-tweaked-documentation.git
