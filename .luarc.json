@@ -5,6 +5,7 @@
   "workspace.ignoreSubmodules": false,
   "workspace.checkThirdParty": "ApplyInMemory",
   "workspace.library": [
-    "./lls-addons/CC-tweaked/"
+    "./lls-addons/CC-tweaked/",
+    "./src/"
   ]
 }
