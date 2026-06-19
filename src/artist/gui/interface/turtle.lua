@@ -1,15 +1,20 @@
-local interface = require "artist.gui.interface"
-local concurrent = require "artist.lib.concurrent"
-local Items = require "artist.core.items"
-local turtle_helpers = require "artist.lib.turtle"
-local schema = require "artist.lib.config".schema
+local interface = require("artist.gui.interface")
+local concurrent = require("artist.lib.concurrent")
+local Items = require("artist.core.items")
+local turtle_helpers = require("artist.lib.turtle")
+local schema = require("artist.lib.config").schema
 
 return function(context)
   local this_turtle = turtle_helpers.get_name()
 
   local config = context.config
     :group("turtle", "Options related to the turtle interface")
-    :define("auto_drop", "Drop items from the turtle, rather than leaving them in the inventory.", false, schema.boolean)
+    :define(
+      "auto_drop",
+      "Drop items from the turtle, rather than leaving them in the inventory.",
+      false,
+      schema.boolean
+    )
     :get()
 
   local items = context:require(Items)
@@ -19,7 +24,9 @@ return function(context)
   -- We don't want to do drop off items while extracting, so we also keep track of any remaining tasks.
   local extract_tasks = 0
   local protected_slots = {}
-  for i = 1, 16 do protected_slots[i] = false end
+  for i = 1, 16 do
+    protected_slots[i] = false
+  end
   local scheduled_dropoff = false
 
   -- Create a separate task queue for turtle tasks.
@@ -44,13 +51,17 @@ return function(context)
       end
     end
 
-    if config.auto_drop then turtle.select(1) end
+    if config.auto_drop then
+      turtle.select(1)
+    end
     extract_tasks = extract_tasks - 1
   end
 
   local function turtle_dropoff()
     scheduled_dropoff = false
-    if extract_tasks > 0 then return end
+    if extract_tasks > 0 then
+      return
+    end
 
     for i = 1, 16 do
       local protect_item = protected_slots[i]
@@ -88,7 +99,9 @@ return function(context)
     extract_tasks = extract_tasks + 1
 
     items:extract(this_turtle, hash, quantity, nil, function()
-      turtle_tasks.spawn(function() turtle_pickup(hash) end)
+      turtle_tasks.spawn(function()
+        turtle_pickup(hash)
+      end)
     end)
   end)
 end
